@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Tracker - Kanpeki + Cult UI Design</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --background: #0f0f23;
+            --surface: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --sidebar-bg: rgba(0, 0, 0, 0.6);
+            --titlebar-bg: rgba(0, 0, 0, 0.8);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Animated Background */
+        .warp-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.1) 0%, transparent 50%);
+            animation: warpMove 20s ease-in-out infinite;
+        }
+        
+        @keyframes warpMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(-20px, -20px) rotate(1deg); }
+            66% { transform: translate(20px, -10px) rotate(-1deg); }
+        }
+        
+        .desktop-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            margin: 10px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Dynamic Island */
+        .dynamic-island {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 8px 16px;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        
+        .dynamic-island:hover {
+            transform: translateX(-50%) scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .island-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .energy-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+        }
+        
+        .island-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .island-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--success);
+        }
+        
+        /* Title Bar */
+        .title-bar {
+            height: 50px;
+            background: var(--titlebar-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+        
+        .title-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .app-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .app-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .window-controls {
+            display: flex;
+        }
+        
+        .window-btn {
+            width: 46px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .window-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .window-btn.close:hover {
+            background: #ef4444;
+        }
+        
+        /* Main Layout */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-profile {
+            padding: 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .nav-items {
+            flex: 1;
+            padding: 16px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+        }
+        
+        .nav-item.active {
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        /* Kanpeki Cards */
+        .kanpeki-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .kanpeki-card:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary);
+        }
+        
+        /* Cult UI Texture Buttons */
+        .texture-button {
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            padding: 16px 20px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .texture-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="1" fill="white" opacity="0.1"/><circle cx="80" cy="40" r="1" fill="white" opacity="0.1"/><circle cx="40" cy="80" r="1" fill="white" opacity="0.1"/></svg>');
+            pointer-events: none;
+        }
+        
+        .texture-button:hover {
+            transform: translateY(-2px) scale(0.95);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .texture-button:active {
+            transform: translateY(0) scale(0.95);
+        }
+        
+        /* Accordion */
+        .accordion {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .accordion-item {
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .accordion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .accordion-trigger {
+            width: 100%;
+            padding: 16px 0;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+        
+        .accordion-trigger:hover {
+            color: var(--primary);
+        }
+        
+        .accordion-icon {
+            transition: transform 0.2s;
+        }
+        
+        .accordion-item.expanded .accordion-icon {
+            transform: rotate(180deg);
+        }
+        
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .accordion-item.expanded .accordion-content {
+            max-height: 200px;
+        }
+        
+        .accordion-body {
+            padding-bottom: 16px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        
+        /* Insights Grid */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .insight-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .insight-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .insight-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .insight-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .insight-description {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+        
+        .insight-action {
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .insight-action:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="warp-background"></div>
+    
+    <div class="desktop-container">
+        <!-- Dynamic Island -->
+        <div class="dynamic-island" onclick="toggleIsland()">
+            <div class="island-content">
+                <div class="energy-dot"></div>
+                <span class="island-text">Energy</span>
+                <span class="island-value">7/10</span>
+            </div>
+        </div>
+        
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <div class="title-info">
+                <div class="app-icon">⚡</div>
+                <div class="app-title">Energy Tracker</div>
+            </div>
+            <div class="window-controls">
+                <div class="window-btn">−</div>
+                <div class="window-btn">□</div>
+                <div class="window-btn close">×</div>
+            </div>
+        </div>
+        
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="user-profile">
+                    <div class="profile-avatar">👤</div>
+                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px;">Welcome Back!</div>
+                    <div style="color: var(--text-muted); font-size: 14px;">Track your energy</div>
+                </div>
+                
+                <div class="nav-items">
+                    <div class="nav-item">
+                        <span>📊</span>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="nav-item">
+                        <span>📈</span>
+                        <span>History</span>
+                    </div>
+                    <div class="nav-item">
+                        <span>📉</span>
+                        <span>Analytics</span>
+                    </div>
+                    <div class="nav-item active">
+                        <span>💡</span>
+                        <span>Insights</span>
+                    </div>
+                    <div class="nav-item">
+                        <span>⚙️</span>
+                        <span>Settings</span>
+                    </div>
+                </div>
+                
+                <div style="padding: 24px;">
+                    <button class="texture-button" style="width: 100%;">
+                        <span>➕</span>
+                        <span>Quick Log</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Content Area -->
+            <div class="content-area">
+                <h1 style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">Energy Insights</h1>
+                <p style="color: var(--text-muted); margin-bottom: 30px;">Discover patterns and get personalized recommendations</p>
+                
+                <!-- Insight Cards -->
+                <div class="insights-grid">
+                    <div class="insight-card" style="border-color: rgba(34, 197, 94, 0.3);">
+                        <div class="insight-header">
+                            <div class="insight-icon" style="background: rgba(34, 197, 94, 0.1); color: var(--success);">📈</div>
+                            <div class="insight-title">Peak Performance</div>
+                        </div>
+                        <div class="insight-description">
+                            Your energy peaks between 9-11 AM. Schedule important tasks during this window.
+                        </div>
+                        <a href="#" class="insight-action">
+                            View Schedule →
+                        </a>
+                    </div>
+                    
+                    <div class="insight-card" style="border-color: rgba(102, 126, 234, 0.3);">
+                        <div class="insight-header">
+                            <div class="insight-icon" style="background: rgba(102, 126, 234, 0.1); color: var(--primary);">🌙</div>
+                            <div class="insight-title">Sleep Impact</div>
+                        </div>
+                        <div class="insight-description">
+                            Quality sleep increases your next-day energy by 23% on average.
+                        </div>
+                        <a href="#" class="insight-action">
+                            Sleep Tips →
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Detailed Analysis -->
+                <div class="kanpeki-card">
+                    <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Detailed Analysis</h2>
+                    
+                    <div class="accordion">
+                        <div class="accordion-item expanded">
+                            <button class="accordion-trigger">
+                                <span style="display: flex; align-items: center; gap: 12px;">
+                                    <span style="color: var(--success);">📈</span>
+                                    Energy Patterns
+                                </span>
+                                <span class="accordion-icon">▼</span>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="accordion-body">
+                                    Your energy levels are highest in the morning (9-11 AM) and tend to dip after lunch. Consider scheduling important tasks during your peak hours.
+                                    <br><br>
+                                    <span style="color: var(--warning); font-weight: 600;">💡 Peak hours: 9-11 AM</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <button class="accordion-trigger">
+                                <span style="display: flex; align-items: center; gap: 12px;">
+                                    <span style="color: var(--primary);">🌙</span>
+                                    Sleep Impact
+                                </span>
+                                <span class="accordion-icon">▼</span>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="accordion-body">
+                                    Your energy levels correlate strongly with sleep quality. Days following 7+ hours of sleep show 23% higher average energy.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <button class="accordion-trigger">
+                                <span style="display: flex; align-items: center; gap: 12px;">
+                                    <span style="color: var(--warning);">🏃</span>
+                                    Activity Recommendations
+                                </span>
+                                <span class="accordion-icon">▼</span>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="accordion-body">
+                                    Based on your patterns, here are personalized recommendations for optimizing your energy levels.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div style="margin-top: 30px;">
+                    <div class="kanpeki-card">
+                        <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Quick Actions</h3>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                            <button class="texture-button" style="background: var(--primary);">
+                                <span>➕</span>
+                                <span>Log Energy</span>
+                            </button>
+                            <button class="texture-button" style="background: var(--success);">
+                                <span>📈</span>
+                                <span>View Trends</span>
+                            </button>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <button class="texture-button" style="background: var(--warning);">
+                                <span>💡</span>
+                                <span>Insights</span>
+                            </button>
+                            <button class="texture-button" style="background: #8b5cf6;">
+                                <span>⚙️</span>
+                                <span>Settings</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Accordion functionality
+        document.querySelectorAll('.accordion-trigger').forEach(trigger => {
+            trigger.addEventListener('click', () => {
+                const item = trigger.closest('.accordion-item');
+                const isExpanded = item.classList.contains('expanded');
+                
+                // Close all items
+                document.querySelectorAll('.accordion-item').forEach(i => {
+                    i.classList.remove('expanded');
+                });
+                
+                // Open clicked item if it wasn't expanded
+                if (!isExpanded) {
+                    item.classList.add('expanded');
+                }
+            });
+        });
+        
+        // Dynamic Island interaction
+        function toggleIsland() {
+            const island = document.querySelector('.dynamic-island');
+            island.style.transform = 'translateX(-50%) scale(1.1)';
+            setTimeout(() => {
+                island.style.transform = 'translateX(-50%) scale(1)';
+            }, 150);
+        }
+        
+        // Navigation interaction
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Card hover effects
+        document.querySelectorAll('.kanpeki-card, .insight-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-4px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

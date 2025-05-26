@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Tracker - Nyxb UI Design</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --background: 0 0% 100%;
+            --foreground: 240 10% 3.9%;
+            --card: 0 0% 100%;
+            --card-foreground: 240 10% 3.9%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 240 10% 3.9%;
+            --primary: 240 5.9% 10%;
+            --primary-foreground: 0 0% 98%;
+            --secondary: 240 4.8% 95.9%;
+            --secondary-foreground: 240 5.9% 10%;
+            --muted: 240 4.8% 95.9%;
+            --muted-foreground: 240 3.8% 46.1%;
+            --accent: 240 4.8% 95.9%;
+            --accent-foreground: 240 5.9% 10%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 240 5.9% 90%;
+            --input: 240 5.9% 90%;
+            --ring: 240 5.9% 10%;
+            --radius: 0.5rem;
+        }
+
+        .dark {
+            --background: 240 10% 3.9%;
+            --foreground: 0 0% 98%;
+            --card: 240 10% 3.9%;
+            --card-foreground: 0 0% 98%;
+            --popover: 240 10% 3.9%;
+            --popover-foreground: 0 0% 98%;
+            --primary: 0 0% 98%;
+            --primary-foreground: 240 5.9% 10%;
+            --secondary: 240 3.7% 15.9%;
+            --secondary-foreground: 0 0% 98%;
+            --muted: 240 3.7% 15.9%;
+            --muted-foreground: 240 5% 64.9%;
+            --accent: 240 3.7% 15.9%;
+            --accent-foreground: 0 0% 98%;
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 240 3.7% 15.9%;
+            --input: 240 3.7% 15.9%;
+            --ring: 240 4.9% 83.9%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            min-height: 100vh;
+            padding: 20px;
+            background-image:
+                radial-gradient(circle at 25% 25%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
+        }
+
+        .phone-container {
+            max-width: 375px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .status-bar {
+            background: #f8f9fa;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, #667eea20, #764ba220);
+            padding: 30px 20px;
+        }
+
+        .greeting {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .date {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .content {
+            padding: 20px;
+            background: white;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            color: #667eea;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .trend-badge {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            flex: 1;
+            background: #f0f4ff;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 8px 0 4px 0;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .energy-indicator {
+            margin-bottom: 16px;
+        }
+
+        .energy-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .energy-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            width: 65%;
+            border-radius: 4px;
+        }
+
+        .insight-box {
+            background: #e8f5e8;
+            border: 1px solid #c8e6c9;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .insight-icon {
+            color: #4caf50;
+            margin-right: 12px;
+        }
+
+        .energy-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+
+        .energy-button {
+            aspect-ratio: 1;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .energy-button.selected {
+            background: #4caf50;
+            border-color: #4caf50;
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .energy-number {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .energy-label {
+            font-size: 8px;
+            margin-top: 2px;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .energy-circle {
+            width: 48px;
+            height: 48px;
+            background: #4caf50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 16px;
+        }
+
+        .history-details {
+            flex: 1;
+        }
+
+        .history-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .history-note {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .history-time {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            cursor: pointer;
+        }
+
+        .bottom-nav {
+            display: flex;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            padding: 10px 0;
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            width: 100%;
+            max-width: 375px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>100%</span>
+        </div>
+
+        <div class="app-header">
+            <div class="greeting">Good Morning</div>
+            <div class="date">Wednesday, December 18</div>
+        </div>
+
+        <div class="content">
+            <!-- Quick Stats Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📊</div>
+                    <div class="card-title">Today's Energy</div>
+                    <div class="trend-badge">Improving</div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="card-icon">📈</div>
+                        <div class="stat-value">6.5</div>
+                        <div class="stat-label">Average</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="card-icon">📝</div>
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">Entries</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="card-icon">📅</div>
+                        <div class="stat-value">6.2</div>
+                        <div class="stat-label">Weekly Avg</div>
+                    </div>
+                </div>
+
+                <div class="energy-indicator">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-weight: 500;">Energy Level</span>
+                        <span style="font-weight: bold; color: #4caf50;">6.5/10</span>
+                    </div>
+                    <div class="energy-bar">
+                        <div class="energy-fill"></div>
+                    </div>
+                </div>
+
+                <div class="insight-box">
+                    <div class="insight-icon">✅</div>
+                    <div>Good energy levels today. You're on track for a productive day.</div>
+                </div>
+            </div>
+
+            <!-- Recent Entries Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🕒</div>
+                    <div class="card-title">Recent Entries</div>
+                    <a href="#" style="color: #667eea; text-decoration: none; font-size: 14px;">View All</a>
+                </div>
+
+                <div class="history-item">
+                    <div class="energy-circle">8</div>
+                    <div class="history-details">
+                        <div class="history-title">High Energy</div>
+                        <div class="history-note">Great workout this morning! Feeling energized.</div>
+                        <div class="history-time">2 hours ago</div>
+                    </div>
+                </div>
+
+                <div class="history-item">
+                    <div class="energy-circle" style="background: #ff9800;">6</div>
+                    <div class="history-details">
+                        <div class="history-title">Moderate Energy</div>
+                        <div class="history-note">Post-lunch dip but still productive</div>
+                        <div class="history-time">5 hours ago</div>
+                    </div>
+                </div>
+
+                <div class="history-item">
+                    <div class="energy-circle" style="background: #4caf50;">9</div>
+                    <div class="history-details">
+                        <div class="history-title">Very High Energy</div>
+                        <div class="history-note">Perfect start to the day</div>
+                        <div class="history-time">8 hours ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <div>🏠</div>
+                <div>Home</div>
+            </div>
+            <div class="nav-item">
+                <div>📊</div>
+                <div>History</div>
+            </div>
+            <div class="nav-item">
+                <div>💡</div>
+                <div>Insights</div>
+            </div>
+            <div class="nav-item">
+                <div>👤</div>
+                <div>Profile</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fab" onclick="showEnergyModal()">+</div>
+
+    <!-- Energy Logging Modal -->
+    <div class="modal-overlay" id="energyModal">
+        <div class="modal-content">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2>How's your energy?</h2>
+                <p style="color: #666; margin-top: 8px;">Rate your current energy level from 1 to 10</p>
+            </div>
+
+            <div class="energy-grid">
+                <div class="energy-button" onclick="selectEnergy(1)">
+                    <div class="energy-number">1</div>
+                    <div class="energy-label">Low</div>
+                </div>
+                <div class="energy-button" onclick="selectEnergy(2)">
+                    <div class="energy-number">2</div>
+                </div>
+                <div class="energy-button" onclick="selectEnergy(3)">
+                    <div class="energy-number">3</div>
+                </div>
+                <div class="energy-button" onclick="selectEnergy(4)">
+                    <div class="energy-number">4</div>
+                </div>
+                <div class="energy-button" onclick="selectEnergy(5)">
+                    <div class="energy-number">5</div>
+                    <div class="energy-label">Medium</div>
+                </div>
+                <div class="energy-button" onclick="selectEnergy(6)">
+                    <div class="energy-number">6</div>
+                </div>
+                <div class="energy-button" onclick="selectEnergy(7)">
+                    <div class="energy-number">7</div>
+                </div>
+                <div class="energy-button selected" onclick="selectEnergy(8)">
+                    <div class="energy-number">8</div>
+                </div>
+                <div class="energy-button" onclick="selectEnergy(9)">
+                    <div class="energy-number">9</div>
+                </div>
+                <div class="energy-button" onclick="selectEnergy(10)">
+                    <div class="energy-number">10</div>
+                    <div class="energy-label">High</div>
+                </div>
+            </div>
+
+            <div style="background: #e8f5e8; border: 1px solid #c8e6c9; border-radius: 8px; padding: 12px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center;">
+                    <span style="margin-right: 8px;">🔋</span>
+                    <span>Very energetic, feeling great</span>
+                </div>
+            </div>
+
+            <textarea placeholder="How are you feeling? What affected your energy?"
+                      style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px; resize: none; height: 80px;"></textarea>
+
+            <button onclick="saveEntry()"
+                    style="width: 100%; background: #667eea; color: white; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer;">
+                Save Entry
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function showEnergyModal() {
+            document.getElementById('energyModal').classList.add('show');
+        }
+
+        function hideEnergyModal() {
+            document.getElementById('energyModal').classList.remove('show');
+        }
+
+        function selectEnergy(level) {
+            document.querySelectorAll('.energy-button').forEach(btn => btn.classList.remove('selected'));
+            event.target.closest('.energy-button').classList.add('selected');
+        }
+
+        function saveEntry() {
+            hideEnergyModal();
+            // Show success message
+            alert('Energy level logged successfully!');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('energyModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideEnergyModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Tracker - Nyxb UI Design</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --background: #0f0f23;
+            --surface: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        .warp-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(102, 126, 234, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.2) 0%, transparent 50%);
+            animation: warpMove 20s ease-in-out infinite;
+        }
+        
+        @keyframes warpMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(-20px, -20px) rotate(1deg); }
+            66% { transform: translate(20px, -10px) rotate(-1deg); }
+        }
+        
+        .phone-container {
+            max-width: 375px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 25px;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .status-bar {
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .content {
+            padding: 20px;
+            min-height: 600px;
+        }
+        
+        .greeting {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--text);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 4px;
+        }
+        
+        .date {
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+        
+        /* Magic Card */
+        .magic-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .magic-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .magic-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            transition: left 0.5s;
+        }
+        
+        .magic-card:hover::before {
+            left: 100%;
+        }
+        
+        .energy-display {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .energy-info h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        
+        .energy-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: var(--primary);
+            line-height: 1;
+        }
+        
+        .energy-suffix {
+            font-size: 24px;
+            color: #666;
+        }
+        
+        /* Circular Progress */
+        .circular-progress {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring__circle {
+            stroke: var(--border);
+            stroke-width: 8;
+            fill: transparent;
+            r: 40;
+            cx: 50;
+            cy: 50;
+        }
+        
+        .progress-ring__progress {
+            stroke: var(--primary);
+            stroke-width: 8;
+            stroke-linecap: round;
+            fill: transparent;
+            r: 40;
+            cx: 50;
+            cy: 50;
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: 125.6;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .progress-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .progress-label {
+            font-size: 10px;
+            color: #666;
+        }
+        
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-card.success {
+            border-color: var(--success);
+        }
+        
+        .stat-card.warning {
+            border-color: var(--warning);
+        }
+        
+        .stat-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .success { color: var(--success); }
+        .warning { color: var(--warning); }
+        .danger { color: var(--danger); }
+        
+        /* Section Title */
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--text);
+            margin-bottom: 12px;
+        }
+        
+        /* Entry Card */
+        .entry-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .entry-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .energy-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .entry-details {
+            flex: 1;
+        }
+        
+        .entry-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        
+        .entry-note {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .entry-time {
+            color: #666;
+            font-size: 12px;
+        }
+        
+        /* Shimmer Button */
+        .shimmer-button {
+            background: var(--primary);
+            border: none;
+            border-radius: 28px;
+            padding: 16px 20px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .shimmer-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+        
+        .shimmer-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: left 0.6s;
+        }
+        
+        .shimmer-button:hover::before {
+            left: 100%;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            padding: 10px 0;
+        }
+        
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            color: var(--text-muted);
+            font-size: 12px;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        /* Number Ticker Animation */
+        @keyframes numberTick {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        .number-ticker {
+            animation: numberTick 0.8s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="warp-background"></div>
+    
+    <div class="phone-container">
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>🔋 100%</span>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">Good Morning</div>
+            <div class="date">Wednesday, December 18</div>
+            
+            <!-- Main Energy Display -->
+            <div class="magic-card">
+                <div class="energy-display">
+                    <div class="energy-info">
+                        <h3>Current Energy</h3>
+                        <div>
+                            <span class="energy-value number-ticker">7.2</span>
+                            <span class="energy-suffix">/10</span>
+                        </div>
+                    </div>
+                    <div class="circular-progress">
+                        <svg class="progress-ring" width="100" height="100">
+                            <circle class="progress-ring__circle"></circle>
+                            <circle class="progress-ring__progress"></circle>
+                        </svg>
+                        <div class="progress-text">
+                            <div class="progress-number">7</div>
+                            <div class="progress-label">/10</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-card success">
+                    <div class="stat-icon success">📈</div>
+                    <div class="stat-value success number-ticker">3</div>
+                    <div class="stat-label">Entries Today</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-icon warning">📅</div>
+                    <div class="stat-value warning number-ticker">6.8</div>
+                    <div class="stat-label">Weekly Avg</div>
+                </div>
+            </div>
+            
+            <!-- Recent Entries -->
+            <div class="section-title">Recent Entries</div>
+            
+            <div class="entry-card">
+                <div class="energy-circle" style="background: var(--success);">8</div>
+                <div class="entry-details">
+                    <div class="entry-title">High Energy</div>
+                    <div class="entry-note">Great workout this morning! Feeling energized.</div>
+                    <div class="entry-time">2 hours ago</div>
+                </div>
+            </div>
+            
+            <div class="entry-card">
+                <div class="energy-circle" style="background: var(--warning);">6</div>
+                <div class="entry-details">
+                    <div class="entry-title">Moderate Energy</div>
+                    <div class="entry-note">Post-lunch dip but still productive</div>
+                    <div class="entry-time">5 hours ago</div>
+                </div>
+            </div>
+            
+            <div class="entry-card">
+                <div class="energy-circle" style="background: var(--success);">9</div>
+                <div class="entry-details">
+                    <div class="entry-title">Very High Energy</div>
+                    <div class="entry-note">Perfect start to the day</div>
+                    <div class="entry-time">8 hours ago</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <div class="nav-icon">🏠</div>
+                <div>Home</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">📊</div>
+                <div>History</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">💡</div>
+                <div>Insights</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">👤</div>
+                <div>Profile</div>
+            </div>
+        </div>
+    </div>
+    
+    <button class="shimmer-button">
+        <span>➕</span>
+        <span>Log Energy</span>
+    </button>
+    
+    <script>
+        // Animate circular progress
+        const progressCircle = document.querySelector('.progress-ring__progress');
+        const progress = 0.72; // 72%
+        const circumference = 2 * Math.PI * 40;
+        const offset = circumference - (progress * circumference);
+        progressCircle.style.strokeDashoffset = offset;
+        
+        // Add hover effects to magic cards
+        document.querySelectorAll('.magic-card, .entry-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-4px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Animate numbers on load
+        setTimeout(() => {
+            document.querySelectorAll('.number-ticker').forEach(el => {
+                el.style.animation = 'numberTick 0.8s ease-out';
+            });
+        }, 500);
+    </script>
+</body>
+</html>

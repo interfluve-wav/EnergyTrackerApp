@@ -1,0 +1,15 @@
+{
+  "name": "energy-tracker",
+  "version": "1.0.0",
+  "description": "EnergyTracker - Professional Wellness Analytics Platform",
+  "scripts": {
+    "start": "cd web-dashboard && npm run dev",
+    "install-deps": "cd web-dashboard && npm install",
+    "setup": "cd web-dashboard && npm install && echo '✅ Setup complete! Run: npm start'",
+    "dev": "cd web-dashboard && npm run dev",
+    "build": "cd web-dashboard && npm run build"
+  },
+  "keywords": ["energy", "tracking", "wellness", "analytics"],
+  "author": "EnergyTracker Team",
+  "license": "MIT"
+}

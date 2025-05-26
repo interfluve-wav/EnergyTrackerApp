@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Tracker - Desktop App Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --background: #0f0f23;
+            --surface: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --sidebar-bg: rgba(0, 0, 0, 0.6);
+            --titlebar-bg: rgba(0, 0, 0, 0.8);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Animated Background */
+        .warp-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.1) 0%, transparent 50%);
+            animation: warpMove 20s ease-in-out infinite;
+        }
+        
+        @keyframes warpMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(-20px, -20px) rotate(1deg); }
+            66% { transform: translate(20px, -10px) rotate(-1deg); }
+        }
+        
+        .desktop-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            margin: 10px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Title Bar */
+        .title-bar {
+            height: 50px;
+            background: var(--titlebar-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            -webkit-app-region: drag;
+        }
+        
+        .title-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .app-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .app-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .window-controls {
+            display: flex;
+            -webkit-app-region: no-drag;
+        }
+        
+        .window-btn {
+            width: 46px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .window-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .window-btn.close:hover {
+            background: #ef4444;
+        }
+        
+        .window-btn svg {
+            width: 10px;
+            height: 10px;
+            stroke: var(--text-muted);
+            stroke-width: 1;
+        }
+        
+        /* Main Layout */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-profile {
+            padding: 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .profile-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .profile-subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        .nav-items {
+            flex: 1;
+            padding: 16px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+        }
+        
+        .nav-item.active {
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+        }
+        
+        .quick-log-btn {
+            margin: 24px;
+            padding: 16px;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .quick-log-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .content-header {
+            margin-bottom: 30px;
+        }
+        
+        .greeting {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .date {
+            font-size: 18px;
+            color: var(--text-muted);
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .main-energy-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .main-energy-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .energy-display {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+        
+        .energy-info h3 {
+            font-size: 20px;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+        
+        .energy-value {
+            font-size: 64px;
+            font-weight: bold;
+            color: var(--primary);
+            line-height: 1;
+        }
+        
+        .energy-suffix {
+            font-size: 32px;
+            color: #666;
+        }
+        
+        .energy-description {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-top: 16px;
+        }
+        
+        .circular-progress {
+            width: 150px;
+            height: 150px;
+            position: relative;
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring__circle {
+            stroke: var(--border);
+            stroke-width: 8;
+            fill: transparent;
+            r: 65;
+            cx: 75;
+            cy: 75;
+        }
+        
+        .progress-ring__progress {
+            stroke: var(--primary);
+            stroke-width: 8;
+            stroke-linecap: round;
+            fill: transparent;
+            r: 65;
+            cx: 75;
+            cy: 75;
+            stroke-dasharray: 408;
+            stroke-dashoffset: 122;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .progress-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .progress-label {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .stats-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-card.success { border-color: var(--success); }
+        .stat-card.warning { border-color: var(--warning); }
+        .stat-card.danger { border-color: var(--danger); }
+        
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .success { color: var(--success); }
+        .warning { color: var(--warning); }
+        .danger { color: var(--danger); }
+        
+        /* Bottom Section */
+        .bottom-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        
+        .section-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(20px);
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .entry-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .entry-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .energy-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .entry-details {
+            flex: 1;
+        }
+        
+        .entry-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .entry-note {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+        
+        .entry-time {
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .action-btn {
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        
+        .action-btn.success {
+            background: var(--success);
+        }
+        
+        .action-btn.success:hover {
+            background: #16a34a;
+        }
+    </style>
+</head>
+<body>
+    <div class="warp-background"></div>
+    
+    <div class="desktop-container">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <div class="title-info">
+                <div class="app-icon">⚡</div>
+                <div class="app-title">Energy Tracker</div>
+            </div>
+            <div class="window-controls">
+                <div class="window-btn">
+                    <svg viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
+                </div>
+                <div class="window-btn">
+                    <svg viewBox="0 0 10 10"><rect width="9" height="9" x="0.5" y="0.5" fill="none" stroke="currentColor"/></svg>
+                </div>
+                <div class="window-btn close">
+                    <svg viewBox="0 0 10 10"><path d="m0,0 l10,10 m0,-10 l-10,10" stroke="currentColor"/></svg>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="user-profile">
+                    <div class="profile-avatar">👤</div>
+                    <div class="profile-name">Welcome Back!</div>
+                    <div class="profile-subtitle">Track your energy</div>
+                </div>
+                
+                <div class="nav-items">
+                    <div class="nav-item active">
+                        <div class="nav-icon">📊</div>
+                        <div>Dashboard</div>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">📈</div>
+                        <div>History</div>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">📉</div>
+                        <div>Analytics</div>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">💡</div>
+                        <div>Insights</div>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">⚙️</div>
+                        <div>Settings</div>
+                    </div>
+                </div>
+                
+                <button class="quick-log-btn">
+                    <span>➕</span>
+                    <span>Quick Log</span>
+                </button>
+            </div>
+            
+            <!-- Content Area -->
+            <div class="content-area">
+                <div class="content-header">
+                    <div class="greeting">Good Morning</div>
+                    <div class="date">Wednesday, December 18, 2024</div>
+                </div>
+                
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <div class="main-energy-card">
+                        <div class="energy-display">
+                            <div class="energy-info">
+                                <h3>Current Energy Level</h3>
+                                <div>
+                                    <span class="energy-value">7.2</span>
+                                    <span class="energy-suffix">/10</span>
+                                </div>
+                                <div class="energy-description">
+                                    Good energy levels. You're doing well.
+                                </div>
+                            </div>
+                            <div class="circular-progress">
+                                <svg class="progress-ring" width="150" height="150">
+                                    <circle class="progress-ring__circle"></circle>
+                                    <circle class="progress-ring__progress"></circle>
+                                </svg>
+                                <div class="progress-text">
+                                    <div class="progress-number">7</div>
+                                    <div class="progress-label">/10</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-column">
+                        <div class="stat-card success">
+                            <div class="stat-icon success">📝</div>
+                            <div class="stat-value success">3</div>
+                            <div class="stat-label">Today's Entries</div>
+                        </div>
+                        <div class="stat-card warning">
+                            <div class="stat-icon warning">📈</div>
+                            <div class="stat-value warning">6.8</div>
+                            <div class="stat-label">Weekly Average</div>
+                        </div>
+                        <div class="stat-card success">
+                            <div class="stat-icon success">📊</div>
+                            <div class="stat-value success">Improving</div>
+                            <div class="stat-label">Trend</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bottom Section -->
+                <div class="bottom-section">
+                    <div class="section-card">
+                        <div class="section-title">Recent Entries</div>
+                        
+                        <div class="entry-item">
+                            <div class="energy-circle" style="background: var(--success);">8</div>
+                            <div class="entry-details">
+                                <div class="entry-title">High Energy</div>
+                                <div class="entry-note">Great workout this morning! Feeling energized.</div>
+                            </div>
+                            <div class="entry-time">2 hours ago</div>
+                        </div>
+                        
+                        <div class="entry-item">
+                            <div class="energy-circle" style="background: var(--warning);">6</div>
+                            <div class="entry-details">
+                                <div class="entry-title">Moderate Energy</div>
+                                <div class="entry-note">Post-lunch dip but still productive</div>
+                            </div>
+                            <div class="entry-time">5 hours ago</div>
+                        </div>
+                        
+                        <div class="entry-item">
+                            <div class="energy-circle" style="background: var(--success);">9</div>
+                            <div class="entry-details">
+                                <div class="entry-title">Very High Energy</div>
+                                <div class="entry-note">Perfect start to the day</div>
+                            </div>
+                            <div class="entry-time">8 hours ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-card">
+                        <div class="section-title">Quick Actions</div>
+                        
+                        <button class="action-btn">
+                            <span>➕</span>
+                            <span>Log Energy Level</span>
+                        </button>
+                        
+                        <button class="action-btn success">
+                            <span>💡</span>
+                            <span>View Insights</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Animate circular progress
+        const progressCircle = document.querySelector('.progress-ring__progress');
+        const progress = 0.72; // 72%
+        const circumference = 2 * Math.PI * 65;
+        const offset = circumference - (progress * circumference);
+        progressCircle.style.strokeDashoffset = offset;
+        
+        // Add hover effects
+        document.querySelectorAll('.main-energy-card, .stat-card, .entry-item').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-4px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Navigation interaction
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
